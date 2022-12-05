@@ -1,0 +1,89 @@
+function createGame(cubes) {
+
+    if (cubes == 10) {
+        cubes = 9;
+    }
+    if (cubes == 11) {
+        cubes = 12;
+    }
+    if (cubes > 12) {
+        cubes = 12;
+    }
+
+    var colors = ["red", "green", "blue", "darkblue", "yellow", "grey", "purple"];
+
+    // foreach colors
+    var this_cubes = [];
+    var this_wrong = [];
+
+    var rand_wrong = Math.floor(Math.random() * cubes);
+
+    for (var i = 0; i < cubes; i++) {
+        var rand_int = Math.floor(Math.random() * (colors.length - 1));
+        this_cubes.push(colors[rand_int]);
+
+        if (i == rand_wrong) {
+            this_wrong.push(colors[rand_int + 1]);
+        } else {
+            this_wrong.push(colors[rand_int]);
+        }
+    }
+
+    $('.game_inner').addClass('level_' + cubes);
+
+    //for each this_cubes
+    for (var i = 0; i < this_cubes.length; i++) {
+        if (rand_wrong == i) {
+            wrong_class = 'wrong';
+        } else {
+            wrong_class = 'right';
+        }
+        $('.field1').append('<div class="' + this_cubes[i] + ' ' + wrong_class + '"><div></div></div>');
+        $('.field2').append('<div class="' + this_wrong[i] + ' ' + wrong_class + '"><div></div></div>');
+    }
+
+    setTimeout(function () {
+        $('.game_inner').fadeIn('slow');
+
+        $('.game_inner .field1 .wrong, .game_inner .field2 .wrong').unbind('click').on('click', function () {
+
+            updatePoints(cubes);
+            $('.points_plus').html('+' + cubes);
+            $('.points_plus').fadeIn('slow');
+            setTimeout(function () {
+                $('.points_plus').fadeOut('slow');
+            }, 1000);
+
+            $('.game_inner').fadeOut('slow');
+            $('.game_inner .field1').html('');
+            $('.game_inner .field2').html('');
+            $('.game_inner').removeClass('level_' + cubes);
+
+            setTimeout(function () {
+                createGame(cubes + 2);
+            }, 1000);
+        });
+
+        $('.game_inner .field1 .right, .game_inner .field2 .right').unbind('click').on('click', function () {
+            //minus points
+            updatePoints(-5);
+            $('.points_minus').fadeIn('slow');
+            setTimeout(function () {
+                $('.points_minus').fadeOut('slow');
+            }, 1000);
+        });
+
+    }, 500);
+
+}
+
+
+function startGame() {
+    createGame(2);
+    Promotion.timer(60);
+}
+
+function updatePoints(new_points) {
+    points += new_points;
+    $points.innerHTML = points;
+}
